@@ -7,6 +7,29 @@ prompt.start();
 require('colors');
 
 /**
+ * Used to return values to powershell process
+ *
+ * @param privateKey
+ * @param publicKey
+ * @param cert
+ */
+var returnKeyCredAsJSON = function (keycred) {
+
+  // Convert the keycred to JSON.
+  keycred = keycred.toJSON();
+
+  // Get the key credentials.
+  console.log(
+    JSON.stringify({
+      credentials: keycred.keycred,
+      privateKey: keycred.privateKey,
+      fingerprint: keycred.fingerprint,
+      certificate: keycred.cert
+    }
+  ));
+};
+
+/**
  * Generates new key credentials.
  *
  * @param privateKey
@@ -38,6 +61,22 @@ var printKeyCred = function (keycred) {
   console.log('Certificate Fingerprint:');
   console.log(keycred.fingerprint.green);
 };
+
+if (nconf.get('newcert') === "y" || nconf.get('newcert') === "yes") {
+  var certparams = {
+    countryName: nconf.get('country'),
+    province: nconf.get('province'),
+    localityName: nconf.get('locality'),
+    organizationName: nconf.get('org'),
+    ou: nconf.get('ou'),
+    commonName: nconf.get('commonName'),
+    expireInYears: nconf.get('expireinyears')
+  }
+
+  // log credentials as JSON to be consumed as stdout
+  returnKeyCredAsJSON(new KeyCred(certparams));
+  return;
+}
 
 var privateKey = nconf.get('key');
 var cert = nconf.get('cert');
